@@ -20,9 +20,10 @@ struct Node{
     let state: String
     let uuid: String
     let node_cluster: String?
+    let deployed_datetime: NSDate?
 
 
-    init(cpu: Int, current_num_containers: Int, disk: Double, external_fqdn: String, last_seen: NSDate, memory: Double, nickname: String, state: String, uuid: String, node_cluster: String? = nil, public_ip: String?){
+    init(cpu: Int, current_num_containers: Int, disk: Double, external_fqdn: String, last_seen: NSDate, memory: Double, nickname: String, state: String, uuid: String, node_cluster: String? = nil, public_ip: String?, deployed_datetime: NSDate? = nil){
         self.cpu                    = cpu
         self.current_num_containers = current_num_containers
         self.disk                   = disk
@@ -34,6 +35,7 @@ struct Node{
         self.state                  = state
         self.uuid                   = uuid
         self.node_cluster           = node_cluster
+        self.deployed_datetime      = deployed_datetime
     }
     
 }
@@ -56,7 +58,11 @@ struct NodeParser : JSONParserType {
         
         let public_ip    = json["public_ip"] as? String
         let node_cluster = json["node_cluster"] as? String
-        return Node(cpu: cpu, current_num_containers: current_num_containers, disk: disk, external_fqdn: external_fqdn, last_seen: last_seen_date, memory: memory, nickname: nickname, state: state, uuid: uuid, node_cluster: node_cluster, public_ip: public_ip)
         
+        
+        let deployed_date_string = json["deployed_datetime"] as? String
+        let deployed_datetime : NSDate? = deployed_date_string != nil ? CloudDateParser().dateFromString(deployed_date_string!) : nil
+        let node = Node(cpu: cpu, current_num_containers: current_num_containers, disk: disk, external_fqdn: external_fqdn, last_seen: last_seen_date, memory: memory, nickname: nickname, state: state, uuid: uuid, node_cluster: node_cluster, public_ip: public_ip,deployed_datetime: deployed_datetime)
+        return node
     }
 }

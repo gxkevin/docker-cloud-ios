@@ -18,7 +18,7 @@ class NodeViewController: UIViewController {
                 print("No nodes found")
                 return
             }
-            print(nodes[0])
+            print(nodes)
         }
         // Do any additional setup after loading the view.
     }
