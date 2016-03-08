@@ -9,8 +9,7 @@
 import Foundation
 import Alamofire
 
-//khoigeeky:713068be-df30-4361-8a78-821b9a946bc1
-//a2hvaWdlZWt5OjcxMzA2OGJlLWRmMzAtNDM2MS04YTc4LTgyMWI5YTk0NmJjMQ==
+
 class CloudClient{
     private var _userName: String
     private var _apiKey: String
@@ -34,16 +33,30 @@ class CloudClient{
         return Alamofire.request(signedRequest)
     }
     
-    func getNodes(udid: String? = nil, state: String? = nil, node_cluster: String? = nil, node_type: String? = nil, region: String? = nil, docker_version: String? = nil, completion: ([Node]?) -> ()){
+    func getNodes(udid: String? = nil, state: NodeState? = nil, node_cluster: String? = nil, node_type: String? = nil, region: String? = nil, docker_version: String? = nil, completion: ([Node]?) -> Void ){
         _request(CloudRouter.ListNodes(udid: udid, state: state, node_cluster: node_cluster, node_type: node_type, region: region, docker_version: docker_version))
-        .responseJSON { (response) -> Void in
+        .responseJSON { response in
             guard let json = response.result.value, objects = json["objects"] as? [JSONDictionary] else{
                 print("Can't parse the data")
                 completion(nil)
                 return
             }
-            let nodes : [Node] = objects.flatMap{ NodeParser().parseJSON($0)  }
+            let nodes : [Node] = objects.flatMap(NodeParser.parseJSON)
             completion(nodes)
+        }
+    }
+    
+    func getNodeClusters(uuid: String? = nil, state: NodeClusterState? = nil, name: String? = nil, region: String? = nil, node_type: String? = nil, completion: ([NodeCluster]?) -> Void ){
+        _request(CloudRouter.ListNodeClusters(uuid: uuid, state: state, name: name, region: region, node_type: node_type))
+        .responseJSON{ response in
+            guard let json = response.result.value, objects = json["objects"] as? [JSONDictionary] else{
+                print("Can't parse the data")
+                completion(nil)
+                return
+            }
+            
+            let nodeClusters : [NodeCluster] = objects.flatMap(NodeClusterParser.parseJSON)
+            completion(nodeClusters)
         }
     }
 }

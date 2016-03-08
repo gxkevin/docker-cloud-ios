@@ -12,5 +12,5 @@ typealias JSONDictionary = [String: AnyObject]
 
 protocol JSONParserType {
     typealias T
-    func parseJSON(json: JSONDictionary) -> T?
+    static func parseJSON(json: JSONDictionary) -> T?
 }
